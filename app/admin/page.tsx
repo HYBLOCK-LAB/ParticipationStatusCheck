@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { encodeEvent } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -152,7 +153,7 @@ export default function AdminDashboard() {
               </div>
               
               <QRCodeSVG
-                value={`${baseUrl}/?event=${encodeURIComponent(event)}`}
+                value={`${baseUrl}/?event=${encodeURIComponent(encodeEvent(event))}`}
                 size={150}
                 includeMargin={true}
               />
@@ -166,9 +167,12 @@ export default function AdminDashboard() {
                   {event === data.activeEvent ? '활성화됨' : '출석 활성화'}
                 </button>
                 
-                <div style={{ fontSize: '12px' }}>
-                  <a href={`https://api.qr-server.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`${baseUrl}/?event=${encodeURIComponent(event)}`)}`} target="_blank" rel="noopener noreferrer">
+                <div style={{ fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  <a href={`https://api.qr-server.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`${baseUrl}/?event=${encodeURIComponent(encodeEvent(event))}`)}`} target="_blank" rel="noopener noreferrer">
                     고화질 QR 다운로드
+                  </a>
+                  <a href={`${baseUrl}/?event=${encodeURIComponent(encodeEvent(event))}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)' }}>
+                    링크 테스트
                   </a>
                 </div>
               </div>

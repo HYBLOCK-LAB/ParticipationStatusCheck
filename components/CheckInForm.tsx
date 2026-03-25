@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import members from '@/lib/members.json';
+import { decodeEvent } from '@/lib/utils';
 
 export default function CheckInForm() {
   const searchParams = useSearchParams();
-  const event = searchParams.get('event');
+  const encodedParam = searchParams.get('event');
+  const event = encodedParam ? decodeEvent(encodedParam) : null;
+  
   const [activeEvent, setActiveEvent] = useState<string | null>(null);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [name, setName] = useState('');
@@ -38,7 +41,7 @@ export default function CheckInForm() {
     setMessage(null);
 
     if (!isEventOpen) {
-      setMessage({ type: 'error', text: '현재 진행 중인 이벤트가 아닙니다. 관리자에게 문의하세요.' });
+      setMessage({ type: 'error', text: '현재 세션 또는 이벤트가 존재하지 않습니다.' });
       setLoading(false);
       return;
     }
@@ -76,17 +79,9 @@ export default function CheckInForm() {
 
   return (
     <>
-      {!event ? (
+      {!isEventOpen ? (
         <div className="error">
-          QR 코드를 통해 접속해주세요.
-        </div>
-      ) : !activeEvent ? (
-        <div className="error">
-          현재 활성화된 출석 이벤트가 없습니다.
-        </div>
-      ) : !isEventOpen ? (
-        <div className="error">
-          마감된 이벤트이거나 현재 활성화된 이벤트가 아닙니다.
+          현재 세션 또는 이벤트가 존재하지 않습니다.
         </div>
       ) : (
         <p style={{ marginBottom: '20px', fontWeight: 'bold' }}>
