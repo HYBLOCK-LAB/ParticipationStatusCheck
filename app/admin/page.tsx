@@ -10,12 +10,20 @@ interface AttendanceRow {
   [key: string]: string;
 }
 
+interface EventStats {
+  attendance: number;
+  late: number;
+  absence: number;
+}
+
 export default function AdminDashboard() {
   const [data, setData] = useState<{ events: string[], attendanceData: AttendanceRow[], activeEvent: string | null } | null>(null);
   const [newEventName, setNewEventName] = useState('');
   const [loading, setLoading] = useState(true);
+  const [activatingEvent, setActivatingEvent] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [baseUrl, setBaseUrl] = useState('');
+  const [viewingQR, setViewingQR] = useState<string | null>(null);
 
   useEffect(() => {
     setBaseUrl(window.location.origin);
@@ -40,7 +48,7 @@ export default function AdminDashboard() {
   };
 
   const handleSetActive = async (eventName: string) => {
-    setLoading(true);
+    setActivatingEvent(eventName);
     try {
       const response = await fetch('/api/events', {
         method: 'POST',
@@ -48,12 +56,17 @@ export default function AdminDashboard() {
         body: JSON.stringify({ eventName, setActive: true }),
       });
       if (response.ok) {
-        await fetchData();
+        // Fetch fresh data to update the active status
+        const freshResponse = await fetch('/api/events');
+        const freshResult = await freshResponse.json();
+        if (freshResponse.ok) {
+          setData(freshResult);
+        }
       }
     } catch (err) {
       setError('활성 이벤트 설정 실패');
     } finally {
-      setLoading(false);
+      setActivatingEvent(null);
     }
   };
 
@@ -80,105 +93,116 @@ export default function AdminDashboard() {
     }
   };
 
-  if (loading && !data) return <div>로딩 중...</div>;
-  if (error) return <div className="error">{error}</div>;
+  const getStats = (eventName: string): EventStats => {
+    if (!data) return { attendance: 0, late: 0, absence: 0 };
+    return data.attendanceData.reduce((acc, row) => {
+      const status = row[eventName];
+      if (status === 'Attendence') acc.attendance++;
+      else if (status === 'Late') acc.late++;
+      else if (status === 'Absence') acc.absence++;
+      return acc;
+    }, { attendance: 0, late: 0, absence: 0 });
+  };
+
+  if (loading && !data) return <div className="container" style={{ color: 'white' }}>로딩 중...</div>;
+  if (error) return <div className="container"><div className="error">{error}</div></div>;
 
   return (
     <div className="container container-wide">
-      <div className="logo-container">
-        <img src="/logo.png" alt="Logo" className="logo" />
-      </div>
-      
-      <h1>관리자 대시보드</h1>
-
-      <div className="card">
-        <h3>새 이벤트 추가</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <h1 style={{ margin: 0, textAlign: 'left' }}>이벤트 관리</h1>
         <div style={{ display: 'flex', gap: '10px' }}>
           <input
             type="text"
             value={newEventName}
             onChange={(e) => setNewEventName(e.target.value)}
-            placeholder="이벤트 이름 (예: Basic5)"
-            style={{ marginBottom: 0 }}
+            placeholder="새 이벤트 이름"
+            style={{ marginBottom: 0, width: '200px', height: '45px' }}
           />
-          <button onClick={handleAddEvent} disabled={loading}>추가</button>
+          <button onClick={handleAddEvent} disabled={loading} style={{ width: 'auto', height: '45px', padding: '0 20px' }}>
+            추가
+          </button>
         </div>
       </div>
 
-      <div className="card" style={{ overflowX: 'auto' }}>
-        <h3>출석 현황</h3>
-        {data && (
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
-            <thead>
-              <tr style={{ backgroundColor: '#f2f2f2' }}>
-                <th style={{ padding: '10px', border: '1px solid #ddd', textAlign: 'left' }}>이름</th>
-                {data.events.map(event => (
-                  <th key={event} style={{ padding: '10px', border: '1px solid #ddd' }}>{event}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.attendanceData.map((row, idx) => (
-                <tr key={idx}>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{Object.values(row)[0]}</td>
-                  {data.events.map(event => (
-                    <td key={event} style={{ padding: '10px', border: '1px solid #ddd', textAlign: 'center' }}>
-                      {row[event] === 'Attendence' ? '✅' : row[event] === 'Late' ? '⏰' : row[event] === 'Absence' ? '❌' : '-'}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+        {data?.events.map(event => {
+          const stats = getStats(event);
+          const isActive = event === data.activeEvent;
+          const isActivating = event === activatingEvent;
 
-      <div className="card">
-        <h3>이벤트별 QR 코드</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px', marginTop: '20px' }}>
-          {data?.events.map(event => (
-            <div 
-              key={event} 
-              style={{ 
-                textAlign: 'center', 
-                padding: '15px', 
-                border: event === data.activeEvent ? '2px solid var(--accent-color)' : '1px solid #ddd', 
-                borderRadius: '8px',
-                background: event === data.activeEvent ? 'rgba(59, 130, 246, 0.05)' : 'transparent'
-              }}
-            >
-              <div style={{ marginBottom: '10px' }}>
-                <span style={{ fontWeight: 'bold' }}>{event}</span>
-                {event === data.activeEvent && <span style={{ marginLeft: '5px', fontSize: '12px', color: 'var(--accent-color)' }}>(활성)</span>}
+          return (
+            <div key={event} className="card" style={{ padding: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                <h3 style={{ margin: 0 }}>{event}</h3>
+                {isActive && <span className="event-label" style={{ background: '#10b981', color: 'white' }}>활성 세션</span>}
               </div>
-              
-              <QRCodeSVG
-                value={`${baseUrl}/?event=${encodeURIComponent(encodeEvent(event))}`}
-                size={150}
-                includeMargin={true}
-              />
 
-              <div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <button 
-                  onClick={() => handleSetActive(event)} 
-                  disabled={loading || event === data.activeEvent}
-                  style={{ padding: '8px', fontSize: '12px', background: event === data.activeEvent ? '#10b981' : 'var(--primary-color)' }}
-                >
-                  {event === data.activeEvent ? '활성화됨' : '출석 활성화'}
-                </button>
-                
-                <div style={{ fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                  <a href={`https://api.qr-server.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`${baseUrl}/?event=${encodeURIComponent(encodeEvent(event))}`)}`} target="_blank" rel="noopener noreferrer">
-                    고화질 QR 다운로드
-                  </a>
-                  <a href={`${baseUrl}/?event=${encodeURIComponent(encodeEvent(event))}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-secondary)' }}>
-                    링크 테스트
-                  </a>
+              <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '10px' }}>
+                <div style={{ flex: 1, textAlign: 'center', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>출석</div>
+                  <div style={{ fontWeight: '800', fontSize: '1.2rem', color: '#10b981' }}>{stats.attendance}</div>
+                </div>
+                <div style={{ flex: 1, textAlign: 'center', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>지각</div>
+                  <div style={{ fontWeight: '800', fontSize: '1.2rem', color: '#fbbf24' }}>{stats.late}</div>
+                </div>
+                <div style={{ flex: 1, textAlign: 'center', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>결석</div>
+                  <div style={{ fontWeight: '800', fontSize: '1.2rem', color: '#ef4444' }}>{stats.absence}</div>
                 </div>
               </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <button 
+                  onClick={() => handleSetActive(event)} 
+                  disabled={isActive || isActivating}
+                  style={{ 
+                    background: isActive ? '#10b981' : 'white', 
+                    color: isActive ? 'white' : 'var(--primary-color)',
+                    opacity: isActive ? 1 : 0.9
+                  }}
+                >
+                  {isActivating ? '처리 중...' : isActive ? '현재 활성화됨' : '세션 활성화'}
+                </button>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <button 
+                    onClick={() => setViewingQR(viewingQR === event ? null : event)}
+                    style={{ background: 'rgba(255,255,255,0.1)', color: 'white', fontSize: '0.9rem', padding: '10px' }}
+                  >
+                    {viewingQR === event ? 'QR 닫기' : 'QR 페이지 열기'}
+                  </button>
+                  <a href={`${baseUrl}/?event=${encodeURIComponent(encodeEvent(event))}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                    <button style={{ background: 'rgba(255,255,255,0.1)', color: 'white', fontSize: '0.9rem', padding: '10px' }}>
+                      링크 테스트
+                    </button>
+                  </a>
+                </div>
+
+                {viewingQR === event && (
+                  <div style={{ marginTop: '15px', padding: '15px', background: 'white', borderRadius: '16px', textAlign: 'center' }}>
+                    <QRCodeSVG
+                      value={`${baseUrl}/?event=${encodeURIComponent(encodeEvent(event))}`}
+                      size={180}
+                      includeMargin={true}
+                    />
+                    <div style={{ marginTop: '10px' }}>
+                      <a 
+                        href={`https://api.qr-server.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(`${baseUrl}/?event=${encodeURIComponent(encodeEvent(event))}`)}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ fontSize: '0.8rem', color: 'var(--primary-color)', fontWeight: '700' }}
+                      >
+                        고화질 QR 다운로드 (새창)
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
     </div>
   );
