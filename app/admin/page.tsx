@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 
+export const dynamic = 'force-dynamic';
+
 interface AttendanceRow {
   [key: string]: string;
 }
