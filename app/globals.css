@@ -1,13 +1,13 @@
 :root {
   --primary-color: #0e4a84;
   --primary-dark: #0a3661;
-  --accent-color: #3b82f6;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
+  --accent-color: #60a5fa;
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
   --bg-gradient: linear-gradient(135deg, #0e4a84 0%, #061e35 100%);
-  --glass-bg: rgba(255, 255, 255, 0.95);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  --glass-bg: rgba(14, 74, 132, 0.75); /* Matches logo background with transparency */
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 * {
@@ -31,89 +31,102 @@ body {
 .container {
   width: 100%;
   max-width: 480px;
-  padding: 20px;
+  padding: 24px;
   margin: 0 auto;
 }
 
-/* Full width container for Admin Dashboard */
 .container-wide {
-  max-width: 1000px;
+  max-width: 1100px;
 }
 
 h1 {
-  font-size: 1.875rem;
+  font-size: 2rem;
   font-weight: 800;
-  color: var(--primary-color);
-  margin-bottom: 1.5rem;
+  color: white;
+  margin-bottom: 2rem;
   text-align: center;
   letter-spacing: -0.025em;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary-color);
-  margin-bottom: 1rem;
+  color: white;
+  margin-bottom: 1.25rem;
 }
 
 .card {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
   border: 1px solid var(--glass-border);
-  padding: 2.5rem;
-  border-radius: 24px;
+  padding: 3rem 2.5rem;
+  border-radius: 32px;
   box-shadow: var(--shadow);
-  transition: transform 0.2s ease;
+  color: white;
 }
 
 .logo-container {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .logo {
-  max-width: 160px;
+  max-width: 180px;
   height: auto;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  /* Logo blends into the card background now */
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 input, select {
-  padding: 12px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
   width: 100%;
   font-size: 1rem;
-  margin-bottom: 1.25rem;
-  transition: all 0.2s ease;
-  background: #f8fafc;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: white;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 input:focus, select:focus {
   outline: none;
   border-color: var(--accent-color);
-  background: white;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
 }
 
 button {
   cursor: pointer;
-  padding: 14px 24px;
+  padding: 16px 24px;
   border: none;
-  border-radius: 12px;
-  background: var(--primary-color);
-  color: white;
-  font-size: 1rem;
-  font-weight: 700;
+  border-radius: 16px;
+  background: white;
+  color: var(--primary-color);
+  font-size: 1.1rem;
+  font-weight: 800;
   width: 100%;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 6px -1px rgba(14, 74, 132, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 button:hover {
-  background: var(--primary-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 15px -3px rgba(14, 74, 132, 0.4);
+  background: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.3);
 }
 
 button:active {
@@ -121,65 +134,69 @@ button:active {
 }
 
 button:disabled {
-  background: #94a3b8;
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.4);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
 .success {
-  background: #ecfdf5;
-  color: #065f46;
-  border-left: 4px solid #10b981;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
+  background: rgba(16, 185, 129, 0.2);
+  color: #a7f3d0;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 1.25rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
   font-weight: 600;
   text-align: center;
 }
 
 .error {
-  background: #fef2f2;
-  color: #991b1b;
-  border-left: 4px solid #ef4444;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
+  background: rgba(239, 68, 68, 0.2);
+  color: #fecaca;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 1.25rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
   font-weight: 600;
   text-align: center;
 }
 
-/* Table styling for Admin */
-table {
+/* Table styling for Admin - Dark Mode */
+.card table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
-th {
-  background: #f1f5f9;
-  padding: 12px;
+.card th {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px;
   font-weight: 700;
   text-align: left;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
-td {
-  padding: 12px;
-  border-bottom: 1px solid #f1f5f9;
+.card td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
 }
 
-tr:last-child td {
-  border-bottom: none;
+.card tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+  color: white;
 }
 
 .event-label {
   display: inline-block;
-  padding: 2px 8px;
-  background: #dbeafe;
-  color: #1e40af;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 600;
+  padding: 4px 12px;
+  background: rgba(96, 165, 250, 0.2);
+  color: var(--accent-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
 }
