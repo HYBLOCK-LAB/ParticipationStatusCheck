@@ -65,7 +65,7 @@ export default function AdminDashboard() {
   if (error) return <div className="error">{error}</div>;
 
   return (
-    <div>
+    <div className="container container-wide">
       <div className="logo-container">
         <img src="/logo.png" alt="Logo" className="logo" />
       </div>
