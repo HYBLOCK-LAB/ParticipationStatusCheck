@@ -4,7 +4,7 @@ A simple, QR-based attendance management system for HYBLOCK.
 
 ## Features
 
-- **QR Attendance:** Members can check in by scanning an event-specific QR code and entering their name.
+- **QR Attendance:** Members can check in by scanning an event-specific QR code and entering their name. (15-minute time limit)
 - **Admin Dashboard:** A real-time view of attendance status across all events.
 - **Dynamic Events:** Add new event columns (e.g., Basic, Advanced, Special events) directly from the admin panel.
 - **Google Sheets Sync:** All data is persisted in a Google Sheet for easy management and historical tracking.

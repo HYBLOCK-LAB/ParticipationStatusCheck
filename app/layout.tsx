@@ -4,6 +4,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Participation Status Check',
   description: 'QR-based attendance system',
+  icons: {
+    icon: '/logo.png',
+  },
 }
 
 export default function RootLayout({

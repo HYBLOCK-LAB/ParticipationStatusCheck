@@ -25,11 +25,12 @@ export default function CheckInForm() {
   const encodedParam = searchParams.get('event');
   const event = encodedParam ? decodeEvent(encodedParam) : null;
   
-  const [activeEvent, setActiveEvent] = useState<string | null>(null);
+  const [activeEvent, setActiveEvent] = useState<{ name: string, activatedAt: string } | null>(null);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [timeLeft, setTimeLeft] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEventStatus = async () => {
@@ -48,7 +49,28 @@ export default function CheckInForm() {
     fetchEventStatus();
   }, []);
 
-  const isEventOpen = event && activeEvent && event === activeEvent;
+  useEffect(() => {
+    if (!activeEvent?.activatedAt) return;
+
+    const timer = setInterval(() => {
+      const activatedAt = new Date(activeEvent.activatedAt).getTime();
+      const now = new Date().getTime();
+      const diff = (activatedAt + 15 * 60 * 1000) - now;
+
+      if (diff <= 0) {
+        setTimeLeft('00:00');
+        clearInterval(timer);
+      } else {
+        const minutes = Math.floor(diff / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        setTimeLeft(`${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [activeEvent]);
+
+  const isEventOpen = event && activeEvent && event === activeEvent.name;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,8 +125,20 @@ export default function CheckInForm() {
           현재 세션 또는 이벤트가 존재하지 않습니다.
         </div>
       ) : (
-        <p style={{ marginBottom: '20px', fontWeight: 'bold' }}>
+        <p style={{ marginBottom: '20px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
           <span className="event-label">{translateEvent(event)}</span>
+          {timeLeft && (
+            <span style={{ 
+              fontSize: '0.9rem', 
+              color: timeLeft === '00:00' ? '#ef4444' : '#fbbf24',
+              background: 'rgba(0,0,0,0.2)',
+              padding: '4px 10px',
+              borderRadius: '8px',
+              fontFamily: 'monospace'
+            }}>
+              {timeLeft}
+            </span>
+          )}
         </p>
       )}
       
