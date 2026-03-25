@@ -5,7 +5,7 @@
   --text-primary: #ffffff;
   --text-secondary: #cbd5e1;
   --bg-gradient: linear-gradient(135deg, #0e4a84 0%, #061e35 100%);
-  --glass-bg: rgba(14, 74, 132, 0.85); /* Exact #0E4A84 with transparency for glass effect */
+  --card-bg: #0e4a84; /* EXACT match for logo background */
   --glass-border: rgba(255, 255, 255, 0.1);
   --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
@@ -57,7 +57,9 @@ h3 {
 }
 
 .card {
-  background: var(--glass-bg);
+  background: var(--card-bg);
+  /* Apply opacity to the ENTIRE card so logo and box background change together */
+  opacity: 0.92;
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border: 1px solid var(--glass-border);
@@ -65,6 +67,13 @@ h3 {
   border-radius: 32px;
   box-shadow: var(--shadow);
   color: white;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  opacity: 1;
+  transform: translateY(-4px);
+  box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.6);
 }
 
 .logo-container {
@@ -75,13 +84,9 @@ h3 {
 .logo {
   max-width: 180px;
   height: auto;
-  /* Applying the same opacity filter to the logo so it matches the card's glass transparency */
-  opacity: 0.85; 
-  transition: opacity 0.3s ease;
-}
-
-.card:hover .logo {
-  opacity: 1; /* Cool interaction: logo lights up on hover */
+  /* No individual opacity - it must match the card background exactly */
+  display: block;
+  margin: 0 auto;
 }
 
 label {
@@ -94,7 +99,7 @@ label {
 
 input, select {
   padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
   width: 100%;
@@ -111,7 +116,7 @@ input::placeholder {
 input:focus, select:focus {
   outline: none;
   border-color: var(--accent-color);
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.15);
   box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
 }
 
@@ -131,24 +136,22 @@ button {
 
 button:hover {
   background: #f8fafc;
-  transform: translateY(-2px);
-  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.3);
+  transform: scale(1.02);
 }
 
 button:active {
-  transform: translateY(0);
+  transform: scale(0.98);
 }
 
 button:disabled {
-  background: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.4);
   cursor: not-allowed;
-  transform: none;
   box-shadow: none;
 }
 
 .success {
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.2);
   color: #a7f3d0;
   border: 1px solid rgba(16, 185, 129, 0.2);
   padding: 1.25rem;
@@ -159,7 +162,7 @@ button:disabled {
 }
 
 .error {
-  background: rgba(239, 68, 68, 0.15);
+  background: rgba(239, 68, 68, 0.2);
   color: #fecaca;
   border: 1px solid rgba(239, 68, 68, 0.2);
   padding: 1.25rem;
