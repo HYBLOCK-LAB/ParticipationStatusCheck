@@ -7,14 +7,15 @@ export default function CheckInPage() {
   return (
     <div className="container">
       <div className="card">
-      <div className="logo-container">
-        <img src="/logo.png" alt="Logo" className="logo" />
+        <div className="logo-container">
+          <img src="/logo.png" alt="Logo" className="logo" />
+        </div>
+        
+        <h1>출석 체크</h1>
+        <Suspense fallback={<div>로딩 중...</div>}>
+          <CheckInForm />
+        </Suspense>
       </div>
-      
-      <h1>출석 체크</h1>
-      <Suspense fallback={<div>로딩 중...</div>}>
-        <CheckInForm />
-      </Suspense>
     </div>
   );
 }
