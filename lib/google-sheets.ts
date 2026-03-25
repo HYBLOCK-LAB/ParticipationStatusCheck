@@ -1,7 +1,7 @@
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 
-const SPREADSHEET_ID = '12qNVw-KNq_UPXtS7gX_Vo9tNYFKtGmb_X6_1AnHo3Hs';
+const SPREADSHEET_ID = '13fK8gpFdktyOEPuc5gP3gsLQFrdrCMw80WEYBm6-ENU';
 
 const getDoc = async () => {
   const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
