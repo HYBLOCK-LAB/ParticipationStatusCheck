@@ -10,7 +10,7 @@ interface AttendanceRow {
 }
 
 export default function AdminDashboard() {
-  const [data, setData] = useState<{ events: string[], attendanceData: AttendanceRow[] } | null>(null);
+  const [data, setData] = useState<{ events: string[], attendanceData: AttendanceRow[], activeEvent: string | null } | null>(null);
   const [newEventName, setNewEventName] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,25 @@ export default function AdminDashboard() {
         setError(result.error || '데이터를 불러오지 못했습니다.');
       }
     } catch (err) {
-      setError('서비와 통신 중 오류가 발생했습니다.');
+      setError('서버와 통신 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetActive = async (eventName: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventName, setActive: true }),
+      });
+      if (response.ok) {
+        await fetchData();
+      }
+    } catch (err) {
+      setError('활성 이벤트 설정 실패');
     } finally {
       setLoading(false);
     }
@@ -118,22 +136,41 @@ export default function AdminDashboard() {
         <h3>이벤트별 QR 코드</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px', marginTop: '20px' }}>
           {data?.events.map(event => (
-            <div key={event} style={{ textAlign: 'center', padding: '15px', border: '1px solid #ddd', borderRadius: '8px' }}>
-              <p style={{ fontWeight: 'bold', marginBottom: '10px' }}>{event}</p>
+            <div 
+              key={event} 
+              style={{ 
+                textAlign: 'center', 
+                padding: '15px', 
+                border: event === data.activeEvent ? '2px solid var(--accent-color)' : '1px solid #ddd', 
+                borderRadius: '8px',
+                background: event === data.activeEvent ? 'rgba(59, 130, 246, 0.05)' : 'transparent'
+              }}
+            >
+              <div style={{ marginBottom: '10px' }}>
+                <span style={{ fontWeight: 'bold' }}>{event}</span>
+                {event === data.activeEvent && <span style={{ marginLeft: '5px', fontSize: '12px', color: 'var(--accent-color)' }}>(활성)</span>}
+              </div>
+              
               <QRCodeSVG
                 value={`${baseUrl}/?event=${encodeURIComponent(event)}`}
                 size={150}
                 includeMargin={true}
               />
-              <div style={{ marginTop: '10px', fontSize: '12px', wordBreak: 'break-all' }}>
-                <a href={`https://api.qr-server.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`${baseUrl}/?event=${encodeURIComponent(event)}`)}`} target="_blank" rel="noopener noreferrer">
-                  고화질 QR 다운로드 (QR Server)
-                </a>
-              </div>
-              <div style={{ marginTop: '5px', fontSize: '12px' }}>
-                <a href={`${baseUrl}/?event=${encodeURIComponent(event)}`} target="_blank" rel="noopener noreferrer">
-                  페이지 열기
-                </a>
+
+              <div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <button 
+                  onClick={() => handleSetActive(event)} 
+                  disabled={loading || event === data.activeEvent}
+                  style={{ padding: '8px', fontSize: '12px', background: event === data.activeEvent ? '#10b981' : 'var(--primary-color)' }}
+                >
+                  {event === data.activeEvent ? '활성화됨' : '출석 활성화'}
+                </button>
+                
+                <div style={{ fontSize: '12px' }}>
+                  <a href={`https://api.qr-server.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`${baseUrl}/?event=${encodeURIComponent(event)}`)}`} target="_blank" rel="noopener noreferrer">
+                    고화질 QR 다운로드
+                  </a>
+                </div>
               </div>
             </div>
           ))}
