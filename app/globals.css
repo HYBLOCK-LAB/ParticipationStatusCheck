@@ -5,8 +5,8 @@
   --text-primary: #ffffff;
   --text-secondary: #cbd5e1;
   --bg-gradient: linear-gradient(135deg, #0e4a84 0%, #061e35 100%);
-  --glass-bg: rgba(14, 74, 132, 0.75); /* Matches logo background with transparency */
-  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-bg: rgba(14, 74, 132, 0.85); /* Exact #0E4A84 with transparency for glass effect */
+  --glass-border: rgba(255, 255, 255, 0.1);
   --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
@@ -58,10 +58,10 @@ h3 {
 
 .card {
   background: var(--glass-bg);
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
   border: 1px solid var(--glass-border);
-  padding: 3rem 2.5rem;
+  padding: 3.5rem 2.5rem;
   border-radius: 32px;
   box-shadow: var(--shadow);
   color: white;
@@ -75,7 +75,13 @@ h3 {
 .logo {
   max-width: 180px;
   height: auto;
-  /* Logo blends into the card background now */
+  /* Applying the same opacity filter to the logo so it matches the card's glass transparency */
+  opacity: 0.85; 
+  transition: opacity 0.3s ease;
+}
+
+.card:hover .logo {
+  opacity: 1; /* Cool interaction: logo lights up on hover */
 }
 
 label {
@@ -89,12 +95,12 @@ label {
 input, select {
   padding: 14px 18px;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
   width: 100%;
   font-size: 1rem;
   margin-bottom: 1.5rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   color: white;
 }
 
@@ -106,7 +112,7 @@ input:focus, select:focus {
   outline: none;
   border-color: var(--accent-color);
   background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
 }
 
 button {
@@ -134,17 +140,17 @@ button:active {
 }
 
 button:disabled {
-  background: rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.3);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
 .success {
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.15);
   color: #a7f3d0;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.2);
   padding: 1.25rem;
   border-radius: 16px;
   margin-bottom: 2rem;
@@ -153,9 +159,9 @@ button:disabled {
 }
 
 .error {
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.15);
   color: #fecaca;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.2);
   padding: 1.25rem;
   border-radius: 16px;
   margin-bottom: 2rem;
@@ -163,7 +169,7 @@ button:disabled {
   text-align: center;
 }
 
-/* Table styling for Admin - Dark Mode */
+/* Table styling for Admin - Unified Glass Mode */
 .card table {
   width: 100%;
   border-collapse: separate;
@@ -187,14 +193,14 @@ button:disabled {
 }
 
 .card tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.03);
   color: white;
 }
 
 .event-label {
   display: inline-block;
   padding: 4px 12px;
-  background: rgba(96, 165, 250, 0.2);
+  background: rgba(96, 165, 250, 0.15);
   color: var(--accent-color);
   border-radius: 8px;
   font-size: 0.9rem;
