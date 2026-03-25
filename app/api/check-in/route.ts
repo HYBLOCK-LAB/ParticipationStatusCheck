@@ -11,8 +11,8 @@ export async function POST(request: Request) {
 
     const result = await checkIn(name, event);
 
-    if (result) {
-      return NextResponse.json({ success: true });
+    if (result.success) {
+      return NextResponse.json({ success: true, alreadyCheckedIn: result.alreadyCheckedIn });
     } else {
       return NextResponse.json({ error: 'User not found in spreadsheet.' }, { status: 404 });
     }

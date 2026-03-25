@@ -5,6 +5,21 @@ import { useSearchParams } from 'next/navigation';
 import members from '@/lib/members.json';
 import { decodeEvent } from '@/lib/utils';
 
+const translateEvent = (eventName: string | null) => {
+  if (!eventName) return '';
+  // BasicN -> 기본세션 N주차
+  if (eventName.startsWith('Basic')) {
+    const week = eventName.replace('Basic', '');
+    return `기본세션 ${week}주차`;
+  }
+  // AdvancedN -> 심화세션 N주차
+  if (eventName.startsWith('Advanced')) {
+    const week = eventName.replace('Advanced', '');
+    return `심화세션 ${week}주차`;
+  }
+  return eventName;
+};
+
 export default function CheckInForm() {
   const searchParams = useSearchParams();
   const encodedParam = searchParams.get('event');
@@ -63,8 +78,12 @@ export default function CheckInForm() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage({ type: 'success', text: `${trimmedName}님, ${event} 출석이 완료되었습니다!` });
-        setName('');
+        if (data.alreadyCheckedIn) {
+          setMessage({ type: 'error', text: '이미 출석 완료되었습니다.' });
+        } else {
+          setMessage({ type: 'success', text: `${trimmedName}님, 출석이 완료되었습니다!` });
+          setName('');
+        }
       } else {
         setMessage({ type: 'error', text: data.error || '출석 체크 중 오류가 발생했습니다.' });
       }
@@ -85,7 +104,7 @@ export default function CheckInForm() {
         </div>
       ) : (
         <p style={{ marginBottom: '20px', fontWeight: 'bold' }}>
-          <span className="event-label">진행 중인 이벤트: {event}</span>
+          <span className="event-label">{translateEvent(event)}</span>
         </p>
       )}
       

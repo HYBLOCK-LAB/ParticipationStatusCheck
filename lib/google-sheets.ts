@@ -99,11 +99,17 @@ export async function checkIn(name: string, event: string, status: string = 'Att
     const row = rows.find(r => r.get(nameHeader) === name);
 
     if (row) {
+      // Check if already checked in (value exists and is not empty)
+      const existingStatus = row.get(event);
+      if (existingStatus && existingStatus.trim() !== '') {
+        return { success: true, alreadyCheckedIn: true };
+      }
+
       row.set(event, status);
       await row.save();
-      return true;
+      return { success: true, alreadyCheckedIn: false };
     }
-    return false;
+    return { success: false };
   } catch (error: any) {
     console.error('checkIn error:', error.message);
     throw error;
